@@ -1,0 +1,93 @@
+#!/bin/sh
+
+[ "$DEVTYPE" = "partition" ] || exit
+
+DEVICE="$DEVNAME"
+case "$DEVICE" in
+sd*) ;;
+md*) ;;
+hd*) ;;
+mmcblk*) ;;
+*) exit ;;
+esac
+
+[ "$ACTION" = "add" ] && {
+	fstype="$(lsblk -n -o FSTYPE "/dev/${DEVICE}")"
+	case "$fstype" in
+	'ext2' | 'ext3' | 'ext4' | 'ntfs' | 'exfat' | 'vfat') ;;
+	*) exit ;;
+	esac
+}
+
+[ -f /var/run/config/samba ] || {
+	mkdir -p /var/run/config && touch /var/run/config/samba
+}
+
+. /lib/functions.sh
+
+get_auto_share() {
+	local auto_share_value
+	config_get auto_share_value "$1" auto_share 0
+	[ "$auto_share_value" -eq 1 ] && auto_share=1
+}
+
+get_auto_share_ro() {
+	local auto_share_ro_value
+	config_get auto_share_ro_value "$1" auto_share_ro 0
+	[ "$auto_share_ro_value" -eq 1 ] && auto_share_ro=1
+}
+
+auto_share=0
+auto_share_ro=0
+config_load samba
+config_foreach get_auto_share samba
+config_foreach get_auto_share_ro samba
+
+need_reload=0
+
+[ "$ACTION" = "add" ] && {
+	# 自动挂载可能有延迟，等待挂载完成
+	mount=
+	max_try=10
+	for try_count in $(seq 1 $max_try); do
+		mount="$(lsblk -n -o MOUNTPOINT "/dev/${DEVICE}" | grep '^/')"
+		[ -n "$mount" ] && break
+		sleep 1
+	done
+
+	[ -n "$mount" ] && {
+		share_name="$(echo "$mount" | sed -e 's#^/##g' -e 's#/#_#g')"
+		read_only="no"
+		[ "$auto_share_ro" -eq 1 ] && read_only="yes"
+		mkdir -p /var/lock
+		lock /var/lock/autosamba.lock
+		uci -q -c /var/run/config batch <<-EOF
+			set samba.$DEVICE="sambashare"
+			set samba.$DEVICE.name="$share_name"
+			set samba.$DEVICE.path="$mount"
+			set samba.$DEVICE.browseable="yes"
+			set samba.$DEVICE.read_only="$read_only"
+			set samba.$DEVICE.guest_ok="yes"
+			set samba.$DEVICE.create_mask="0666"
+			set samba.$DEVICE.dir_mask="0777"
+			commit samba
+		EOF
+		lock -u /var/lock/autosamba.lock
+		[ "$auto_share" -eq 1 ] && need_reload=1
+	}
+}
+
+[ "$ACTION" = "remove" ] && {
+	mkdir -p /var/lock
+	lock /var/lock/autosamba.lock
+	[ "$(uci -q -c /var/run/config get "samba.$DEVICE")" = "sambashare" ] && {
+		uci -q -c /var/run/config batch <<-EOF
+			delete samba.$DEVICE
+			commit samba
+		EOF
+		[ "$auto_share" -eq 1 ] && need_reload=1
+	}
+	lock -u /var/lock/autosamba.lock
+}
+
+[ "$need_reload" -eq 1 ] && /etc/init.d/samba running && /etc/init.d/samba reload

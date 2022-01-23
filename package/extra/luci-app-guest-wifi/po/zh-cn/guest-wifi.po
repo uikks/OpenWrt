@@ -1,0 +1,80 @@
+msgid "guest-wifi"
+msgstr "访客网络"
+
+msgid "Guest-wifi"
+msgstr "访客网络"
+
+msgid "Config"
+msgstr "配置"
+
+msgid "You can set guest wifi here. The wifi will be disconnected when enabling/disabling. When creating guest wifi or modifying the settings, please check both \"Enabled\" and \"Create/Remove\". When removing guest wifi, please uncheck \"Enabled\" and check \"Create/Remove\"."
+msgstr "在此可以设置访客网络。启用/禁用访客网络时wifi会断开。当启用访客网络或修改设置时，请同时勾选“启用”和“创建/删除”。当删除访客网络时，不勾选“启用”，勾选“创建/删除”。"
+
+msgid "Enabled"
+msgstr "启用"
+
+msgid "Enable guest wifi"
+msgstr "启用访客网络"
+
+msgid "Create/Remove"
+msgstr "创建/删除"
+
+msgid "Check this to create guest wifi with \"Enabled\" checked; Check this to remove guest wifi with \"Enabled\" unchecked."
+msgstr "勾选“启用”时，同时勾选此项可创建并启用访客网络；未勾选“启用”时，同时勾选此项可删除访客网络。"
+
+msgid "Define device"
+msgstr "指定设备"
+
+msgid "Define device of guest wifi"
+msgstr "指定用于访客网络的设备"
+
+msgid "Wifi name"
+msgstr "无线名称"
+
+msgid "Define the name of guest wifi"
+msgstr "指定访客网络的无线名称"
+
+msgid "Interface IP address"
+msgstr "接口IP地址"
+
+msgid "Define IP address for guest wifi"
+msgstr "指定访客网络的IP地址(不能与其他LAN的IP地址段相同)"
+
+msgid "Encryption"
+msgstr "加密"
+
+msgid "Define encryption of guest wifi"
+msgstr "设置访客网络的无线加密方式"
+
+msgid "No Encryption"
+msgstr "不加密"
+
+msgid "Password"
+msgstr "密码"
+
+msgid "Define the password of guest wifi"
+msgstr "设备访客网络的无线密码"
+
+msgid "Isolation"
+msgstr "隔离"
+
+msgid "Enalbe or disable isolation"
+msgstr "开启或关闭与其它LAN网段的隔离"
+
+msgid "Start address"
+msgstr "起始地址"
+
+msgid "Lowest leased address as offset from the network address"
+msgstr "网络地址分配的起始地址"
+
+msgid "Client Limit"
+msgstr "客户端最大数目"
+
+msgid "Maximum number of leased addresses"
+msgstr "最大地址分配数量"
+
+msgid "DHCP lease time"
+msgstr "DHCP地址租用时间"
+
+msgid "Expiry time of leased addresses, minimum is 2 minutes (2m)"
+msgstr "租用地址的到期时间，最短2分钟(2m)"

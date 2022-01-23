@@ -1,0 +1,11 @@
+#!/bin/sh
+
+if [ "$ACTION" = "ifup" ] && [ "$INTERFACE" = "lan" ]; then
+	lan_ip=$(ifstatus lan | jsonfilter -e '@["ipv4-address"][0].address')
+	lan_ip_old="$(awk 'NR==1{print $1; exit}' /tmp/dnsmasq-lede.router)"
+
+	if [ -n "$lan_ip" ] && [ x"$lan_ip" != x"$lan_ip_old" ]; then
+		echo "$lan_ip lede.router" >/tmp/dnsmasq-lede.router
+		/etc/init.d/dnsmasq restart
+	fi
+fi
